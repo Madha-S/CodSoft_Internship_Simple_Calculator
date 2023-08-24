@@ -1,0 +1,60 @@
+from tkinter import *
+import math
+
+#For setting the frame of the gui
+def frame(root, side):
+    w = Frame(root)
+    w.pack(side=side, expand=YES, fill=BOTH)
+    return w
+
+#Setting the color, size of the displayed buttons
+def button(root, side, text, command=None):
+    w = Button(root, text=text, command=command, font=('Helvetica', 14), bg='#87CEFA', padx=20, pady=20)
+    w.pack(side=side, expand=YES, fill=BOTH)
+    return w
+
+#Class for initializing all the methods involving arthmetic operations
+class Calculator(Frame):
+    def __init__(self):
+        Frame.__init__(self)
+        self.pack(expand=YES, fill=BOTH)
+        self.master.title('Simple Calculator By MADHA')
+        self.master.iconname("calc1")
+        
+        display = StringVar()
+        Entry(self, relief=SUNKEN, textvariable=display, font=('Helvetica', 24), justify='right', bg='#FFC0CB').pack(side=TOP, expand=YES, fill=BOTH)
+        
+        for digits in ("789", "456", "123", "0.-"):
+            digitF = frame(self, TOP)
+            for char in digits:
+                button(digitF, LEFT, char, lambda w=display, s=char: w.set(w.get() + s))
+        
+        operationsF = frame(self, TOP)
+        operations = ("+", "-", "*", "/", "=", "√", "!")
+        for char in operations:
+            if char == '=':
+                btn = button(operationsF, LEFT, char)
+                btn.bind('<ButtonRelease-1>', lambda e, s=self, w=display: s.calculator(w))
+            elif char == '√':
+                btn = button(operationsF, LEFT, char, lambda w=display: w.set(str(math.sqrt(float(w.get())))))
+            elif char == '!':
+                btn = button(operationsF, LEFT, char, lambda w=display: w.set(str(math.factorial(int(w.get())))))
+            else:
+                btn = button(operationsF, LEFT, char, lambda w=display, c=char: w.set(w.get() + ' ' + c + ' '))
+        
+        clearF = frame(self, BOTTOM)
+        button(clearF, LEFT, 'Clr', lambda w=display: w.set(''))
+
+    #Display the result of the operations performed
+    def calculator(self, display):
+        try:
+            display.set(eval(display.get()))
+        #Generate error if zerodivision or any maths error occurs
+        except (ValueError, ZeroDivisionError):
+            display.set("ERROR")
+        except Exception:
+            display.set("INVALID INPUT")
+
+#Main Code
+if __name__ == '__main__':
+    Calculator().mainloop()
